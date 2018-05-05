@@ -491,16 +491,6 @@ public class HomeActivity extends EclairActivity {
   @Subscribe(threadMode = ThreadMode.MAIN)
   public void handlePaymentEvent(PaymentEvent event) {
     mPaymentsListFragment.updateList();
-
-    // Get the list of transactions
-    // TODO: (Daniel) Make a queue of on-chain txs to be distributed on channels
-    final QueryBuilder<Payment> qb = ((App) this.getApplication()).getDBHelper().getDaoSession().getPaymentDao().queryBuilder();
-    qb.whereOr(
-      PaymentDao.Properties.Type.eq(PaymentType.BTC_ONCHAIN),
-      qb.and(PaymentDao.Properties.Type.eq(PaymentType.BTC_LN), PaymentDao.Properties.Status.notEq(PaymentStatus.INIT)));
-    qb.orderDesc(PaymentDao.Properties.Updated).limit(100);
-    final List<Payment> list = qb.list();
-    Log.d(TAG, list.toString());
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
