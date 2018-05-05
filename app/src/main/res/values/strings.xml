@@ -16,7 +16,7 @@
 
 <resources>
   <string name="lang">eng</string>
-  <string name="app_name">Eclair DEV</string>
+  <string name="app_name">Eclair Wallet Testnet</string>
 
   <!-- //////////////// Activities name //////////////////// -->
 
@@ -26,6 +26,7 @@
   <string name="btcpayment_name">Transaction Details</string>
   <string name="channeldetails_name">Channel Details</string>
   <string name="channelrawdata_name">Channel Raw Data</string>
+  <string name="tools_name">Tools</string>
 
   <!-- //////////////// Home //////////////////// -->
 
@@ -114,7 +115,7 @@
   <string name="createrecovery_word_display"><![CDATA[<small>#%1$d</small> <b>%2$s</b>]]></string>
   <string name="createrecovery_generation_failed">Could not generate the recovery phrase…</string>
   <string name="createrecovery_goto_check">OK, got it</string>
-  <string name="createrecovery_check_skip">Skip (only on TESTNET)</string>
+  <string name="createrecovery_check_skip">Skip verification (TESTNET only)</string>
   <string name="createrecovery_check_question">What are the #%1$d, #%2$d and #%3$d words of your recovery phrase?</string>
   <string name="createrecovery_check_input_hint">Type the words here</string>
   <string name="createrecovery_check_button">Check</string>
@@ -169,7 +170,8 @@
   <!-- /////////////// Menus /////////////// -->
 
   <string name="menu_home">Home</string>
-  <string name="menu_networkinfos">Network Overview</string>
+  <string name="menu_networkinfos">Network Info</string>
+  <string name="menu_tools">Tools</string>
   <string name="menu_about">About</string>
   <string name="menu_faq">FAQ</string>
   <string name="menu_preferences">Preferences</string>
@@ -195,6 +197,8 @@
 
   <string name="channeldetails_id_label">Id</string>
   <string name="channeldetails_id_desc">Channel unique identifier</string>
+  <string name="channeldetails_to_self_delay_label">To Self Delay</string>
+  <string name="channeldetails_to_self_delay_desc">Refund delay for uncooperative close</string>
   <string name="channeldetails_reserve_label">Reserve</string>
   <string name="channeldetails_reserve_desc">Minimum balance that this channel must maintain</string>
   <string name="channeldetails_htlcs_count_label">Inflight HTLCs</string>
@@ -353,7 +357,7 @@
 
   <!-- //////////////// Payment Item //////////////////// -->
 
-  <string name="paymentitem_confidence_suffix">conf</string>
+  <string name="paymentitem_confidence_suffix">confs</string>
   <string name="paymentitem_fee_prefix">fee:</string>
 
   <!-- //////////////// General //////////////////// -->
@@ -392,10 +396,6 @@
   <string name="prefs_onchain_explorer">Preferred onchain explorer</string>
   <string name="prefs_onchain_explorer_dialog">Explore onchain tx with</string>
   <string name="prefs_security_title">Security Settings</string>
-  <string name="prefs_advanced_title">Advanced Usage</string>
-  <string name="prefs_advanced_warning">Do not proceed unless you know what you\'re doing.</string>
-  <string name="prefs_advanced_networkdb">Do not delete unless you know what you\'re doing.</string>
-  <string name="prefs_advanced_networkdb_button">Delete Network DB</string>
 
   <!-- //////////////// Scanner messages //////////////////// -->
 
@@ -419,5 +419,15 @@
   <string name="seed_read_general_failure">Could not read seed</string>
   <string name="wallet_init_create_new">Create new wallet</string>
   <string name="wallet_init_import_existing">Import existing wallet</string>
+
+  <!-- //////////////// tools //////////////////// -->
+
+  <string name="tools_advanced_title">Advanced Usage</string>
+  <string name="tools_wallet_title">Wallet</string>
+  <string name="tools_networkdb_label">Delete Network DB</string>
+  <string name="tools_networkdb_desc">Do not delete unless you know what you\'re doing. Restart the application once the DB has been deleted.</string>
+  <string name="tools_networkdb_action">Delete Network DB</string>
+  <string name="tools_xpub_label">Master Public Key</string>
+  <string name="tools_xpub_desc">All your addresses derive from this key.</string>
 
 </resources>
