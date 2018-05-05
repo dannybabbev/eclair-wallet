@@ -91,6 +91,8 @@ public class PaymentSupervisor extends UntypedActor {
       paymentReceived.setConfidenceBlocks((int) walletTransactionReceive.depth());
       paymentReceived.setConfidenceType(0);
 
+      //Log.d(TAG, "New TX" + walletTransactionReceive.tx().t + " received with depth" + walletTransactionReceive.depth());
+
       if (paymentInDB == null) {
         // timestamp is updated only if the transaction is not already known
         paymentReceived.setUpdated(new Date());
@@ -103,7 +105,10 @@ public class PaymentSupervisor extends UntypedActor {
     } else if (message instanceof ElectrumWallet.TransactionConfidenceChanged) {
       Log.d(TAG, "Received TransactionConfidenceChanged message: " + message);
       final ElectrumWallet.TransactionConfidenceChanged walletTransactionConfidenceChanged = (ElectrumWallet.TransactionConfidenceChanged) message;
+
+      // TODO: (Daniel) Transaction depth confirmation updates happen here. Open channels with service
       final int depth = (int) walletTransactionConfidenceChanged.depth();
+
       if (depth < 10) { // ignore tx with confidence > 10 for perfs reasons
         final Payment p = dbHelper.getPayment(walletTransactionConfidenceChanged.txid().toString(), PaymentType.BTC_ONCHAIN);
         if (p != null) {
@@ -117,6 +122,8 @@ public class PaymentSupervisor extends UntypedActor {
       final ElectrumWallet.WalletReady ready = (ElectrumWallet.WalletReady) message;
       Long diffTimestamp = Math.abs(System.currentTimeMillis() / 1000L - ready.timestamp());
       Log.d(TAG, "Received WalletReady message with height=" + ready.height() + " and timestamp diff=" + diffTimestamp);
+      Log.d(TAG, "Confirmed balance: " + ready.confirmedBalance() + ", unconfirmed balance: " + ready.unconfirmedBalance());
+      // The unconfirmed balance only is for tx.depth = 0
       final Satoshi balance = ready.confirmedBalance().$plus(ready.unconfirmedBalance());
       final boolean isSync = diffTimestamp < MAX_DIFF_TIMESTAMP_SEC;
       EventBus.getDefault().post(new WalletStateUpdateEvent(balance, isSync));

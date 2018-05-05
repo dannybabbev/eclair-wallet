@@ -82,10 +82,18 @@ public class DBHelper {
     return qb.unique();
   }
 
+  // TODO: (Daniel) To get on-chain txs with confirmations just add another AND to the query. Same fo the sent
   private final static String rawQueryOnchainReceived = new StringBuilder("SELECT SUM(").append(PaymentDao.Properties.AmountPaidMsat.columnName)
     .append(") FROM ").append(PaymentDao.TABLENAME)
     .append(" WHERE ").append(PaymentDao.Properties.Type.columnName).append(" = '").append(PaymentType.BTC_ONCHAIN).append("'")
     .append(" AND ").append(PaymentDao.Properties.Direction.columnName).append(" = '").append(PaymentDirection.RECEIVED).append("'")
+    .toString();
+
+  private final static String getRawQueryOnchainReceivedAndConfirmed = new StringBuilder("SELECT SUM(").append(PaymentDao.Properties.AmountPaidMsat.columnName)
+    .append(") FROM ").append(PaymentDao.TABLENAME)
+    .append(" WHERE ").append(PaymentDao.Properties.Type.columnName).append(" = '").append(PaymentType.BTC_ONCHAIN).append("'")
+    .append(" AND ").append(PaymentDao.Properties.Direction.columnName).append(" = '").append(PaymentDirection.RECEIVED).append("'")
+    .append(" AND ").append(PaymentDao.Properties.ConfidenceBlocks.columnName).append(" >= 3")
     .toString();
 
   private final static String rawQueryOnchainSent = new StringBuilder("SELECT SUM(").append(PaymentDao.Properties.AmountPaidMsat.columnName)
@@ -94,6 +102,8 @@ public class DBHelper {
     .append(" AND ").append(PaymentDao.Properties.Direction.columnName).append(" = '").append(PaymentDirection.SENT).append("'")
     .toString();
 
+  // TODO: (DANIEL) This returns the on-chain balance by looking at the DB
+  // Get the confirmations of these transactions
   /**
    * Returns the current onchain balance by aggregating the on-chain payments known in the database.
    * Used to initialize the onchain wallet balance at the start of the app.
@@ -113,6 +123,22 @@ public class DBHelper {
     }
     return Math.max(receivedMsat - sentMsat, 0);
   }
+
+  // TODO: (Daniel) a sample function to get the confirmed balance on-chain from DB
+  // This must be called once on startup only
+//  public long getConfirmedOnchainBalanceMsat() {
+//    final Cursor cursorReceived = daoSession.getDatabase().rawQuery(getRawQueryOnchainReceivedAndConfirmed, new String []{});
+//    final Cursor cursorSent = daoSession.getDatabase().rawQuery(rawQueryOnchainSent, new String []{});
+//    long receivedMsat = 0;
+//    long sentMsat = 0;
+//    if (cursorReceived.moveToFirst()) {
+//      receivedMsat = cursorReceived.getLong(0);
+//    }
+//    if (cursorSent.moveToFirst()) {
+//      sentMsat = cursorSent.getLong(0);
+//    }
+//    return Math.max(receivedMsat - sentMsat, 0);
+//  }
 
   void updatePaymentPaid(final Payment p, final long amountPaidMsat, final long feesMsat, final String preimage) {
     p.setPreimage(preimage);

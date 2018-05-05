@@ -75,6 +75,9 @@ public class App extends Application {
   private final static ExchangeRate exchangeRate = new ExchangeRate();
   public final ActorSystem system = ActorSystem.apply("system");
   public AtomicReference<Satoshi> onChainBalance = new AtomicReference<>(new Satoshi(0));
+  // (Daniel) add a new variable to track the confirmed balance available on-chain
+  // using this we'll know how much available balance we have to open the channels
+  public AtomicReference<Satoshi> onChainConfirmedBalance = new AtomicReference<>(new Satoshi(0));
   public AtomicReference<String> pin = new AtomicReference<>(null);
   public AppKit appKit;
   private DBHelper dbHelper;

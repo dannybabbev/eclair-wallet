@@ -50,6 +50,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.greenrobot.eventbus.util.ThrowableFailureEvent;
+import org.greenrobot.greendao.query.QueryBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,6 +78,10 @@ import fr.acinq.eclair.wallet.events.WalletStateUpdateEvent;
 import fr.acinq.eclair.wallet.fragments.ChannelsListFragment;
 import fr.acinq.eclair.wallet.fragments.PaymentsListFragment;
 import fr.acinq.eclair.wallet.fragments.ReceivePaymentFragment;
+import fr.acinq.eclair.wallet.models.Payment;
+import fr.acinq.eclair.wallet.models.PaymentDao;
+import fr.acinq.eclair.wallet.models.PaymentStatus;
+import fr.acinq.eclair.wallet.models.PaymentType;
 import fr.acinq.eclair.wallet.utils.Constants;
 import fr.acinq.eclair.wallet.utils.WalletUtils;
 
@@ -470,6 +475,7 @@ public class HomeActivity extends EclairActivity {
       mBinding.homeConnectionStatus.setVisibility(View.VISIBLE);
     }
     updateBalance();
+    Log.d(TAG, "Wallet balance updating *******");
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -486,6 +492,16 @@ public class HomeActivity extends EclairActivity {
   @Subscribe(threadMode = ThreadMode.MAIN)
   public void handlePaymentEvent(PaymentEvent event) {
     mPaymentsListFragment.updateList();
+
+    // Get the list of transactions
+    // TODO: (Daniel) Make a queue of on-chain txs to be distributed on channels
+    final QueryBuilder<Payment> qb = ((App) this.getApplication()).getDBHelper().getDaoSession().getPaymentDao().queryBuilder();
+    qb.whereOr(
+      PaymentDao.Properties.Type.eq(PaymentType.BTC_ONCHAIN),
+      qb.and(PaymentDao.Properties.Type.eq(PaymentType.BTC_LN), PaymentDao.Properties.Status.notEq(PaymentStatus.INIT)));
+    qb.orderDesc(PaymentDao.Properties.Updated).limit(100);
+    final List<Payment> list = qb.list();
+    Log.d(TAG, list.toString());
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)
@@ -528,6 +544,14 @@ public class HomeActivity extends EclairActivity {
     mBinding.balanceTotal.setAmountMsat(new MilliSatoshi(lnBalance.amount() + walletBalance.amount()));
     mBinding.balanceOnchain.setAmountMsat(walletBalance);
     mBinding.balanceLightning.setAmountMsat(lnBalance);
+
+    try {
+      Log.d(TAG, "Spendable balance LN: " + lnBalanceEvent.availableBalanceMsat + "");
+      Log.d(TAG, "Pending balance LN: " + lnBalanceEvent.pendingBalanceMsat + "");
+    } catch (NullPointerException e){
+      // TODO: (Daniel) Catch this properly
+      e.printStackTrace();
+    }
   }
 
   @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
