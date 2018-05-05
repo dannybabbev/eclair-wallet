@@ -109,13 +109,13 @@ public class PaymentSupervisor extends UntypedActor {
       // TODO: (Daniel) Transaction depth confirmation updates happen here. Open channels with service
       final int depth = (int) walletTransactionConfidenceChanged.depth();
 
-      if (depth < 10) { // ignore tx with confidence > 10 for perfs reasons
-        final Payment p = dbHelper.getPayment(walletTransactionConfidenceChanged.txid().toString(), PaymentType.BTC_ONCHAIN);
-        if (p != null) {
-          p.setConfidenceBlocks(depth);
-          dbHelper.updatePayment(p);
-          EventBus.getDefault().post(new PaymentEvent());
-        }
+      final Payment p = dbHelper.getPayment(walletTransactionConfidenceChanged.txid().toString(), PaymentType.BTC_ONCHAIN);
+      if (p != null) {
+        p.setConfidenceBlocks(depth);
+        dbHelper.updatePayment(p);
+      }
+      if (depth < 10) { // don't update ui for updates in tx with confidence >= 10
+        EventBus.getDefault().post(new PaymentEvent());
       }
 
     } else if (message instanceof ElectrumWallet.WalletReady) {

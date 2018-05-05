@@ -60,6 +60,7 @@ import fr.acinq.eclair.wallet.events.LNNewChannelFailureEvent;
 import fr.acinq.eclair.wallet.events.NetworkChannelsCountEvent;
 import fr.acinq.eclair.wallet.events.NotificationEvent;
 import fr.acinq.eclair.wallet.events.WalletStateUpdateEvent;
+import fr.acinq.eclair.wallet.events.XpubEvent;
 import fr.acinq.eclair.wallet.utils.Constants;
 import scala.Symbol;
 import scala.Tuple2;
@@ -318,15 +319,15 @@ public class App extends Application {
   }
 
   public long estimateSlowFees() {
-    return Math.max(Globals.feeratesPerByte().get().blocks_72(), 1);
+    return Math.max(Globals.feeratesPerKB().get().blocks_72() / 1000, 1);
   }
 
   public long estimateMediumFees() {
-    return Math.max(Globals.feeratesPerByte().get().blocks_12(), estimateSlowFees());
+    return Math.max(Globals.feeratesPerKB().get().blocks_12() / 1000, estimateSlowFees());
   }
 
   public long estimateFastFees() {
-    return Math.max(Globals.feeratesPerByte().get().blocks_2(), estimateMediumFees());
+    return Math.max(Globals.feeratesPerKB().get().blocks_2() / 1000, estimateMediumFees());
   }
 
   /**
@@ -360,6 +361,19 @@ public class App extends Application {
           EventBus.getDefault().post(new ChannelRawDataEvent(o.toString()));
         } else {
           EventBus.getDefault().post(new ChannelRawDataEvent(null));
+        }
+      }
+    }, system.dispatcher());
+  }
+
+  public void getXpubFromWallet() {
+    appKit.electrumWallet.getXpub().onComplete(new OnComplete<ElectrumWallet.GetXpubResponse>() {
+      @Override
+      public void onComplete(Throwable failure, ElectrumWallet.GetXpubResponse success) throws Throwable {
+        if (failure == null && success != null) {
+          EventBus.getDefault().post(new XpubEvent(success));
+        } else {
+          EventBus.getDefault().post(new XpubEvent(null));
         }
       }
     }, system.dispatcher());
